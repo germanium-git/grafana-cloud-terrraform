@@ -1,0 +1,22 @@
+name: Terraform Destroy
+
+on: workflow_dispatch
+
+env:
+  TERRAFORM_VERSION: "1.4.6"
+  TF_IN_AUTOMATION: "True"
+
+jobs:
+  terraform_destroy:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Terraform Destroy
+        uses: ./.github/destroy
+        with:
+          terraform_directory: "terraform"
+          tfcloud_api_token: ${{ secrets.TF_TFCLOUD_TOKEN }}
+          terraform_grafana_api_token: ${{ secrets.TF_GRAFANA_AUTH }}
+          terraform_grafana_url: ${{ variables.TF_GRAFANA_URL }}
