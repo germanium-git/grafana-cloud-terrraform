@@ -13,7 +13,7 @@ jobs:
     environment: test
     if: github.event.review.state != 'approved'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get PR ID
         id: pr-id
@@ -31,6 +31,6 @@ jobs:
           terraform_directory: "terraform"
           tfcloud_api_token: ${{ secrets.TF_TFCLOUD_TOKEN }}
           terraform_grafana_api_token: ${{ secrets.TF_GRAFANA_AUTH }}
-          terraform_grafana_url: ${{ variables.TF_GRAFANA_URL }}
+          terraform_grafana_url: ${{ vars.TF_GRAFANA_URL }}
           github_token: ${{ secrets.GH_TOKEN }}
           pr_id: ${{ steps.pr-id.outputs.PR_NUMBER }}
