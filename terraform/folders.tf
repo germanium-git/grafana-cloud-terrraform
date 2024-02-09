@@ -1,3 +1,3 @@
-resource "grafana_folder" "test_folder" {
-  title = "Terraform Test Folder"
+resource "grafana_folder" "folder1" {
+  title = "TerraformManaged"
 }
