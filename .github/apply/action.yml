@@ -43,7 +43,7 @@ runs:
 
     - name: Download Plan
       id: download-plan
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v3
       with:
         github_token: ${{ inputs.github_token }}
         workflow: plan.yml
