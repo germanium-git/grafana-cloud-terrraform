@@ -1,5 +1,5 @@
 variable "GRAFANA_URL" {
-  type        = string
+  type = string
 }
 
 variable "GRAFANA_AUTH" {

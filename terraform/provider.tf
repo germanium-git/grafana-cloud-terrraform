@@ -1,11 +1,12 @@
 terraform {
-    required_providers {
-        grafana = {
-            source = "grafana/grafana"
-            version = ">= 2.5.0"
-        }
+  required_version = "~> 1.7.3"
+  required_providers {
+    grafana = {
+      source  = "grafana/grafana"
+      version = ">= 2.5.0"
     }
-    backend "remote" {
+  }
+  backend "remote" {
     # The name of your Terraform Cloud organization.
     organization = "mygermanium"
     workspaces {
