@@ -1,0 +1,94 @@
+name: "Terraform: test on PR open"
+
+# set other jobs with the same 'group' in a queue
+concurrency:
+  group: deploy-test
+  cancel-in-progress: false
+
+on:
+  # can be ran manually
+  workflow_dispatch:
+  # run on pull-requests
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    # only if changes were in the 'terraform' directory
+    paths:
+      - terraform/**
+
+env:
+  TERRAFORM_VERSION: "1.7.3"
+
+permissions:
+  # create OpenID Connect (OIDC) ID token
+  id-token: write
+  # allow read repository's content by steps
+  contents: read
+  # allow adding comments in a Pull Request
+  pull-requests: write
+
+jobs:
+
+  terraform:
+
+    name: "Test: Terraform"
+    runs-on: ubuntu-latest
+    # to avoid using GitHub Runners time
+    timeout-minutes: 10
+    defaults:
+      run:
+        # run all steps in the 'terraform' directory
+        working-directory: ./terraform
+
+    steps:
+
+      # get repository's content
+      - name: "Setup: checkout"
+        uses: actions/checkout@v4
+
+      # terraform formatting check
+      - name: "Test: Terraform fmt"
+        id: fmt
+        run: terraform fmt -check -no-color
+        # do not throw error, just warn
+        continue-on-error: true
+
+      # use TFLint to check the code
+      - name: "Setup: TFLint"
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.48.0
+
+      - name: "Show version"
+        run: tflint --version
+
+      - name: Init TFLint
+        run: tflint --init
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: "Test: Terraform linter"
+        run: tflint -f compact
+        shell: bash
+
+      # use official Action
+      - name: "Setup: Terraform"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+          cli_config_credentials_token: ${{ secrets.TF_TFCLOUD_TOKEN }}
+
+      # get modules, configure backend
+      - name: "Test: Terraform Init"
+        id: init
+        run: terraform init -no-color
+
+      # verify whether a configuration is syntactically valid
+      - name: "Test: Terraform Validate"
+        id: validate
+        run: terraform validate -no-color
+
+      # create a Plan to see what will be changed
+      - name: "Test: Terraform Plan"
+        id: plan
+        run: terraform plan -no-color
