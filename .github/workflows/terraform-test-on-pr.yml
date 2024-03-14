@@ -12,8 +12,8 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     # only if changes were in the 'terraform' directory
-    paths:
-      - terraform/**
+    # paths:
+    #   - terraform/**
 
 env:
   TERRAFORM_VERSION: "1.7.3"

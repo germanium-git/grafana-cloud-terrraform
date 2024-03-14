@@ -114,4 +114,21 @@ jobs:
 
       - name: "Deploy: Terraform Apply"
         id: apply
-        run: terraform apply -no-color test-${{ steps.findpr.outputs.pr }}.tfplan
+        shell: bash
+        run: |
+            echo 'apply<<EOF' >> $GITHUB_OUTPUT
+            terraform apply -input=false -no-color test-${{ steps.findpr.outputs.pr }}.tfplan >> $GITHUB_OUTPUT
+            echo 'EOF' >> $GITHUB_OUTPUT
+
+      - name: Comment Apply
+        id: comment-apply
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          issue-number: ${{ steps.findpr.outputs.pr }}
+          body: |
+            Terraform Apply:
+
+            ```
+            ${{ steps.apply.outputs.apply }}
+            ```
