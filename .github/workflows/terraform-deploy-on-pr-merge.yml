@@ -101,7 +101,7 @@ jobs:
       - name: "Misc: Download Terraform Plan"
         uses: dawidd6/action-download-artifact@v3
         with:
-          github_token: ${{secrets.GITHUB_TOKEN}}
+          github_token: ${{ secrets.GH_TOKEN }}
           # the Workflow to look for the artifact
           workflow: terraform-test-on-pr.yml
           # PR number used to generate the artifact and trigger this workflow
@@ -124,7 +124,7 @@ jobs:
         id: comment-apply
         uses: peter-evans/create-or-update-comment@v4
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GH_TOKEN }}
           issue-number: ${{ steps.findpr.outputs.pr }}
           body: |
             Terraform Apply:
