@@ -1,5 +1,7 @@
 name: Automatic Rebase
 on:
+  # can be ran manually
+  workflow_dispatch:
   issue_comment:
     types: [created]
 jobs:

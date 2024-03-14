@@ -1,4 +1,4 @@
-name: "Terraform: test on PR open"
+name: "Terraform: Test on PR open"
 
 # set other jobs with the same 'group' in a queue
 concurrency:
@@ -49,8 +49,8 @@ jobs:
       - name: "Test: Terraform fmt"
         id: fmt
         run: terraform fmt -check -no-color
-        # do not throw error, just warn
-        continue-on-error: true
+        # do not continue and throw error
+        continue-on-error: false
 
       # use TFLint to check the code
       - name: "Setup: TFLint"
@@ -86,9 +86,89 @@ jobs:
       # verify whether a configuration is syntactically valid
       - name: "Test: Terraform Validate"
         id: validate
-        run: terraform validate -no-color
+        shell: bash
+        run: |
+          echo 'validate<<EOF' >> $GITHUB_OUTPUT
+          terraform validate -no-color >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
 
       # create a Plan to see what will be changed
       - name: "Test: Terraform Plan"
         id: plan
-        run: terraform plan -no-color
+        shell: bash
+        run: |
+          echo 'plan<<EOF' >> $GITHUB_OUTPUT
+          terraform plan -input=false -no-color -out=test-${{ github.event.pull_request.number }}.tfplan >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+        env:
+          TF_VAR_GRAFANA_AUTH: ${{ secrets.TF_GRAFANA_AUTH }}
+          TF_VAR_GRAFANA_URL: ${{ vars.TF_GRAFANA_URL }}
+
+      # save as an artifact to this workflow run
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-${{ github.event.pull_request.number }}.tfplan
+          path: "terraform/test-${{ github.event.pull_request.number }}.tfplan"
+          # throw an error if we can't find the Plan's file
+          if-no-files-found: error
+          # replace if an existing one is found
+          overwrite: true
+
+      # generate comment to the Pull Request using 'steps.plan.outputs'
+      - name: "Misc: Post Terraform summary to PR"
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // 1. Retrieve existing bot comments for the PR
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })
+            const botComment = comments.find(comment => {
+              return comment.user.type === 'Bot' && comment.body.includes('Terraform Format and Style')
+            })
+
+            // 2. Prepare format of the comment
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            <details><summary>Validation Output</summary>
+
+            \`\`\`\n
+            ${{ steps.validate.outputs.validate }}
+            \`\`\`
+
+            </details>
+
+            #### Terraform Plan 📖\
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`\n
+            ${{ steps.plan.outputs.plan }}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            // 3. If we have a comment, update it, otherwise create a new one
+            if (botComment) {
+              github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: output
+              })
+            } else {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              })
+            }

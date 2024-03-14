@@ -1,0 +1,117 @@
+name: "Terraform: Apply on push to main"
+
+# set other jobs with the same 'group' in a queue
+concurrency:
+  group: deploy-test
+  cancel-in-progress: false
+
+on:
+  # run on PR merge, e.g. 'push' changes to the 'main'
+  push:
+    branches:
+      - main
+    # only if changes were in the 'terraform' directory
+    paths:
+      - terraform/**
+
+env:
+  TERRAFORM_VERSION: "1.7.3"
+
+
+permissions:
+  # create OpenID Connect (OIDC) ID token
+  id-token: write
+  # allow read repository's content by steps
+  contents: read
+  # get PR number
+  pull-requests: read
+  # allow download artifacts
+  actions: read
+
+jobs:
+
+  deploy:
+
+    name: "Deploy: Terraform"
+    runs-on: ubuntu-latest
+    # to avoid using GitHub Runners time
+    timeout-minutes: 30
+    defaults:
+      run:
+        # run all steps in the 'terraform' directory
+        working-directory: ./terraform
+
+    steps:
+
+      # get repository's content
+      - name: "Setup: checkout"
+        uses: actions/checkout@v4
+
+      # terraform formatting check
+      - name: "Test: Terraform fmt"
+        id: fmt
+        run: terraform fmt -check -no-color
+        # do not throw error, just warn
+        continue-on-error: true
+
+      # use TFLint to check the code
+      - name: "Setup: TFLint"
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.48.0
+
+      - name: "Show version"
+        run: tflint --version
+
+      - name: Init TFLint
+        run: tflint --init
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: "Test: Terraform linter"
+        run: tflint -f compact
+        shell: bash
+
+      # use official Action
+      - name: "Setup: Terraform"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+          cli_config_credentials_token: ${{ secrets.TF_TFCLOUD_TOKEN }}
+
+      # get modules, configure backend
+      - name: "Test: Terraform Init"
+        id: init
+        run: terraform init -no-color
+
+      # verify whether a configuration is syntactically valid
+      - name: "Test: Terraform Validate"
+        id: validate
+        run: terraform validate -no-color
+
+      # get a PR number used to make the 'push' when merging
+      - name: "Misc: get PR number"
+        uses: jwalton/gh-find-current-pr@master
+        id: findpr
+        with:
+          state: all
+
+      # download artifact with the Terraform Plan file of the 'Terraform Test' workflow
+      - name: "Misc: Download Terraform Plan"
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          # the Workflow to look for the artifact
+          workflow: terraform-test-on-pr.yml
+          # PR number used to generate the artifact and trigger this workflow
+          pr: ${{ steps.findpr.outputs.pr }}
+          # artifact's name
+          name: test-${{ steps.findpr.outputs.pr }}.tfplan
+          path: terraform/
+          # ensure we have the file in the workflow
+          check_artifacts: true
+
+      - name: "Deploy: Terraform Apply"
+        id: apply
+        run: terraform apply -no-color test-${{ steps.findpr.outputs.pr }}.tfplan
