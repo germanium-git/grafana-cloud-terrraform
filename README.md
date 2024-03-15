@@ -9,6 +9,12 @@ Grafana Cloud managed by Terraform
 | TF_TFCLOUD_TOKEN | TFCLOUD_TOKEN | Terraform Cloud API token |
 | GH_TOKEN | N/A (used by GH action to push commets to PR) |  GH Organization > Developers Settings > Personal Access Tokens > grafana_cloud GH Action |
 
+Note: There is another secret called GITHUB_TOKEN that is generetaed automatically by GH Action and whose permission is set by Settings > Actions > Workflow permissions.
+```
+Choose the default permissions granted to the GITHUB_TOKEN when running workflows in this repository. You can specify more granular permissions in the workflow using YAML
+```
+
+
 ## Variables
 
 | GH variable  | TF variable  | Description  |
