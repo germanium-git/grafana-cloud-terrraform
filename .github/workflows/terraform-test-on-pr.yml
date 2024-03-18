@@ -103,6 +103,7 @@ jobs:
         env:
           TF_VAR_GRAFANA_AUTH: ${{ secrets.TF_GRAFANA_AUTH }}
           TF_VAR_GRAFANA_URL: ${{ vars.TF_GRAFANA_URL }}
+          TF_VAR_GRAFANA_INFLUX_TOKEN: ${{ secrets.TF_GRAFANA_INFLUX_TOKEN }}
 
       # save as an artifact to this workflow run
       - name: Upload Terraform Plan
