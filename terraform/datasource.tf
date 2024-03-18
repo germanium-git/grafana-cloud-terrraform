@@ -9,6 +9,7 @@ resource "grafana_data_source" "influxdb" {
   json_data_encoded = jsonencode({
     defaultBucket = "Network"
     organization  = "Germanium"
+    httpMode      = "POST"
     timeout       = 10
     tlsSkipVerify = true
     version       = "Flux"
