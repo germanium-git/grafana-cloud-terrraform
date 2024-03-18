@@ -7,6 +7,7 @@ Grafana Cloud managed by Terraform
 |---|---|---|
 | TF_GRAFANA_AUTH | GRAFANA_AUTH | Grafana Cloud Service account |
 | TF_TFCLOUD_TOKEN | TFCLOUD_TOKEN | Terraform Cloud API token |
+| TF_GRAFANA_INFLUX_TOKEN | GRAFANA_INFLUX_TOKEN | InfluxDB API token - `grafana-data-source-terraform` |
 | GH_TOKEN | N/A (used by GH action to push commets to PR) |  GH Organization > Developers Settings > Personal Access Tokens > grafana_cloud GH Action |
 
 Note: There is another secret called GITHUB_TOKEN that is generetaed automatically by GH Action and whose permission is set by Settings > Actions > Workflow permissions.
