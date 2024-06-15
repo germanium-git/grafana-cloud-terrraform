@@ -309,32 +309,7 @@ resource "grafana_dashboard" "traffic_statistics" {
             },
             "unit" : "binbps"
           },
-          "overrides" : [
-            {
-              "__systemRef" : "hideSeriesFrom",
-              "matcher" : {
-                "id" : "byNames",
-                "options" : {
-                  "mode" : "exclude",
-                  "names" : [
-                    "ifHCInOctets {agent_host=\"172.31.1.1\", app=\"snmp\", host=\"telegraf-deployment-75f8f96d77-g72rd\", hostname=\"SRX300-A\", ifName=\"ge-0/0/0.333\", name=\"snmp\"}"
-                  ],
-                  "prefix" : "All except:",
-                  "readOnly" : true
-                }
-              },
-              "properties" : [
-                {
-                  "id" : "custom.hideFrom",
-                  "value" : {
-                    "legend" : false,
-                    "tooltip" : false,
-                    "viz" : true
-                  }
-                }
-              ]
-            }
-          ]
+          "overrides" : []
         },
         "gridPos" : {
           "h" : 10,
@@ -372,7 +347,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/0.222\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/0.333\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
             "refId" : "C"
           }
         ],
