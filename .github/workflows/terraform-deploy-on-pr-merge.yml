@@ -99,7 +99,7 @@ jobs:
 
       # download artifact with the Terraform Plan file of the 'Terraform Test' workflow
       - name: "Misc: Download Terraform Plan"
-        uses: dawidd6/action-download-artifact@v5
+        uses: dawidd6/action-download-artifact@v6
         with:
           github_token: ${{ secrets.GH_TOKEN }}
           # the Workflow to look for the artifact
