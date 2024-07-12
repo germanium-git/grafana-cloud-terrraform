@@ -76,7 +76,7 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
-          cli_config_credentials_token: ${{ secrets.TF_TFCLOUD_TOKEN }}
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       # get modules, configure backend
       - name: "Test: Terraform Init"
