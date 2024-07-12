@@ -2331,3 +2331,157 @@ resource "grafana_dashboard" "teltonika_lte" {
     "weekStart" : ""
   })
 }
+
+resource "grafana_dashboard" "temperature" {
+  folder = grafana_folder.folder1.uid
+  config_json = jsonencode({
+    "annotations" : {
+      "list" : [
+        {
+          "builtIn" : 1,
+          "datasource" : {
+            "type" : "datasource",
+            "uid" : "grafana"
+          },
+          "enable" : true,
+          "hide" : true,
+          "iconColor" : "rgba(0, 211, 255, 1)",
+          "name" : "Annotations & Alerts",
+          "target" : {
+            "limit" : 100,
+            "matchAny" : false,
+            "tags" : [],
+            "type" : "dashboard"
+          },
+          "type" : "dashboard"
+        }
+      ]
+    },
+    "editable" : true,
+    "fiscalYearStartMonth" : 0,
+    "graphTooltip" : 0,
+    "id" : 8,
+    "links" : [],
+    "liveNow" : false,
+    "panels" : [
+      {
+        "datasource" : {
+          "type" : "influxdb",
+          "uid" : "11e7VrHnk"
+        },
+        "fieldConfig" : {
+          "defaults" : {
+            "color" : {
+              "mode" : "palette-classic"
+            },
+            "custom" : {
+              "axisBorderShow" : false,
+              "axisCenteredZero" : false,
+              "axisColorMode" : "text",
+              "axisLabel" : "",
+              "axisPlacement" : "auto",
+              "barAlignment" : 0,
+              "barWidthFactor" : 0.6,
+              "drawStyle" : "line",
+              "fillOpacity" : 0,
+              "gradientMode" : "none",
+              "hideFrom" : {
+                "legend" : false,
+                "tooltip" : false,
+                "viz" : false
+              },
+              "insertNulls" : false,
+              "lineInterpolation" : "linear",
+              "lineWidth" : 1,
+              "pointSize" : 5,
+              "scaleDistribution" : {
+                "type" : "linear"
+              },
+              "showPoints" : "auto",
+              "spanNulls" : false,
+              "stacking" : {
+                "group" : "A",
+                "mode" : "none"
+              },
+              "thresholdsStyle" : {
+                "mode" : "off"
+              }
+            },
+            "mappings" : [],
+            "thresholds" : {
+              "mode" : "absolute",
+              "steps" : [
+                {
+                  "color" : "green",
+                  "value" : null
+                },
+                {
+                  "color" : "red",
+                  "value" : 80
+                }
+              ]
+            }
+          },
+          "overrides" : []
+        },
+        "gridPos" : {
+          "h" : 14,
+          "w" : 24,
+          "x" : 0,
+          "y" : 0
+        },
+        "id" : 2,
+        "options" : {
+          "legend" : {
+            "calcs" : [],
+            "displayMode" : "list",
+            "placement" : "bottom",
+            "showLegend" : true
+          },
+          "tooltip" : {
+            "mode" : "single",
+            "sort" : "none"
+          }
+        },
+        "targets" : [
+          {
+            "datasource" : {
+              "type" : "influxdb",
+              "uid" : "11e7VrHnk"
+            },
+            "hide" : false,
+            "query" : "from(bucket: \"Temperature\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"tmp_in\" or r[\"_measurement\"] == \"tmp_out\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"tmp_in\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId" : "A"
+          },
+          {
+            "datasource" : {
+              "type" : "influxdb",
+              "uid" : "11e7VrHnk"
+            },
+            "hide" : false,
+            "query" : "from(bucket: \"Temperature\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"tmp_in\" or r[\"_measurement\"] == \"tmp_out\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"tmp_out\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId" : "B"
+          }
+        ],
+        "title" : "Temperature",
+        "type" : "timeseries"
+      }
+    ],
+    "refresh" : "",
+    "schemaVersion" : 39,
+    "tags" : [],
+    "templating" : {
+      "list" : []
+    },
+    "time" : {
+      "from" : "now-6h",
+      "to" : "now"
+    },
+    "timepicker" : {},
+    "timezone" : "",
+    "title" : "Temperature",
+    "uid" : "temperature",
+    "version" : 1,
+    "weekStart" : ""
+  })
+}
