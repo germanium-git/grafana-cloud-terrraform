@@ -6,7 +6,7 @@ Grafana Cloud managed by Terraform
 | GH secret  | TF variable  | Description  |
 |---|---|---|
 | TF_GRAFANA_AUTH | GRAFANA_AUTH | Grafana Cloud Service account |
-| TF_TFCLOUD_TOKEN | TFCLOUD_TOKEN | Terraform Cloud API token |
+| TF_API_TOKEN | N/A (used by GH action to talk to the backend in TF Cloud) | Terraform Cloud API token |
 | TF_GRAFANA_INFLUX_TOKEN | GRAFANA_INFLUX_TOKEN | InfluxDB API token - `grafana-data-source-terraform` |
 | GH_TOKEN | N/A (used by GH action to push commets to PR) |  GH Organization > Developers Settings > Personal Access Tokens > grafana_cloud GH Action |
 
