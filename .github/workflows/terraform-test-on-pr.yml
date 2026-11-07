@@ -72,7 +72,7 @@ jobs:
       - name: Init TFLint
         run: tflint --init
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: "Test: Terraform linter"
         run: tflint -f compact
@@ -131,7 +131,7 @@ jobs:
         uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ github.token }}
           script: |
             // 1. Retrieve existing bot comments for the PR
             const { data: comments } = await github.rest.issues.listComments({
