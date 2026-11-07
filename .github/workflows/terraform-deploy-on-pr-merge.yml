@@ -110,7 +110,7 @@ jobs:
 
       # download artifact with the Terraform Plan file of the 'Terraform Test' workflow
       - name: "Misc: Download Terraform Plan"
-        uses: dawidd6/action-download-artifact@v6
+        uses: dawidd6/action-download-artifact@v8
         with:
           github_token: ${{ github.token }}
           # the Workflow to look for the artifact
