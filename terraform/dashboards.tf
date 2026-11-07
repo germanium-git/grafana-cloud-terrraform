@@ -130,7 +130,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/0.111\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/1\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
             "refId" : "A"
           },
           {
@@ -139,11 +139,11 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/0.111\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/1\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
             "refId" : "B"
           }
         ],
-        "title" : "ge-0/0/0.111 - BeskydNet",
+        "title" : "ge-0/0/1 - TlapNet (ISP)",
         "type" : "timeseries"
       },
       {
@@ -234,7 +234,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/0.222\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/0.222\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
             "refId" : "B"
           },
           {
@@ -243,7 +243,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/0.222\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/0.222\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
             "refId" : "C"
           }
         ],
@@ -338,7 +338,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/0.333\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/0.333\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
             "refId" : "B"
           },
           {
@@ -347,7 +347,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/0.333\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/0.333\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
             "refId" : "C"
           }
         ],
@@ -441,7 +441,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/1\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/2\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
             "refId" : "B"
           },
           {
@@ -450,11 +450,11 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/1\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/2\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
             "refId" : "C"
           }
         ],
-        "title" : "ge-0/0/1 - Switch D-Link",
+        "title" : "ge-0/0/2 - Switch D-Link (inside)",
         "type" : "timeseries"
       },
       {
@@ -544,7 +544,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/3\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/3\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
             "refId" : "B"
           },
           {
@@ -553,7 +553,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/3\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/3\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
             "refId" : "C"
           }
         ],
@@ -647,7 +647,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/4\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/4\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
             "refId" : "B"
           },
           {
@@ -656,7 +656,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/4\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/4\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
             "refId" : "C"
           }
         ],
@@ -750,7 +750,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/5\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/5\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
             "refId" : "B"
           },
           {
@@ -759,7 +759,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/5\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/5\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
             "refId" : "C"
           }
         ],
@@ -853,7 +853,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/7\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/7\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
             "refId" : "B"
           },
           {
@@ -862,7 +862,7 @@ resource "grafana_dashboard" "traffic_statistics" {
               "uid" : "$datasource"
             },
             "hide" : false,
-            "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\r\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/7\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+            "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.1\")\n  |> filter(fn: (r) => r[\"hostname\"] == \"SRX300-A\")\n  |> filter(fn: (r) => r[\"ifName\"] == \"ge-0/0/7\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifName\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
             "refId" : "C"
           }
         ],
@@ -966,7 +966,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"1\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"1\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
                 "refId" : "B"
               },
               {
@@ -975,7 +975,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"1\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"1\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
                 "refId" : "C"
               }
             ],
@@ -1068,7 +1068,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"2\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"2\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
                 "refId" : "B"
               },
               {
@@ -1077,7 +1077,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"2\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"2\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
                 "refId" : "C"
               }
             ],
@@ -1170,7 +1170,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"3\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"3\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
                 "refId" : "B"
               },
               {
@@ -1179,7 +1179,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"3\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"3\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
                 "refId" : "C"
               }
             ],
@@ -1272,7 +1272,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"4\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"4\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
                 "refId" : "B"
               },
               {
@@ -1281,7 +1281,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"4\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"4\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
                 "refId" : "C"
               }
             ],
@@ -1375,7 +1375,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"5\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"5\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
                 "refId" : "B"
               },
               {
@@ -1384,7 +1384,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"5\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"5\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
                 "refId" : "C"
               }
             ],
@@ -1478,7 +1478,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"6\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"6\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
                 "refId" : "B"
               },
               {
@@ -1487,7 +1487,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"6\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"6\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
                 "refId" : "C"
               }
             ],
@@ -1581,7 +1581,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"7\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"7\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
                 "refId" : "B"
               },
               {
@@ -1590,7 +1590,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"7\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"7\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
                 "refId" : "C"
               }
             ],
@@ -1684,7 +1684,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCInOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"8\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCInOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"8\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"In\")\n",
                 "refId" : "B"
               },
               {
@@ -1693,7 +1693,7 @@ resource "grafana_dashboard" "traffic_statistics" {
                   "uid" : "$datasource"
                 },
                 "hide" : false,
-                "query" : "from(bucket: \"Network\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mem\" or r[\"_measurement\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifHCOutOctets\")\r\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\r\n  |> filter(fn: (r) => r[\"app\"] == \"snmp\")\r\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"8\")\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))\r\n  |> derivative(unit: 1s, nonNegative: false)\r\n  |> yield(name: \"derivative\" )\r\n  \r\n",
+                "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"snmp\" and r[\"_field\"] == \"ifHCOutOctets\")\n  |> filter(fn: (r) => r[\"agent_host\"] == \"172.31.1.197\")\n  |> filter(fn: (r) => r[\"ifIndex\"] == \"8\")\n  // telegraf 1.10 wrote int, 1.40+ writes uint: convert so both periods merge\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 8.0 }))\n  // one series per interface, not per telegraf pod (the \"host\" tag changes with every pod)\n  |> group(columns: [\"_field\", \"ifIndex\"])\n  |> sort(columns: [\"_time\"])\n  |> derivative(unit: 1s, nonNegative: true)\n  |> set(key: \"_field\", value: \"Out\")\n",
                 "refId" : "C"
               }
             ],
