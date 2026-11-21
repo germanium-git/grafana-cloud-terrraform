@@ -35,9 +35,11 @@ The data source token is the read-only `dashboards` token from `germanium-git/in
    ```sh
    cd influxdb-cloud && terraform output -raw reader_token | gh secret set TF_GRAFANA_INFLUX_TOKEN -R germanium-git/grafana-cloud-terrraform
    ```
-2. Open a PR (any change). Its plan reads the new secret and shows an in-place update of
-   `grafana_data_source.influxdb`; merging applies **that saved plan**. A plan created before the
-   secret changed still contains the old token, so re-run it before merging.
+2. Open a PR that **changes a file under `terraform/`** (the deploy workflow only runs for
+   `terraform/**`; a README-only PR is planned but never applied). Its plan reads the new secret
+   and shows an in-place update of `grafana_data_source.influxdb`; merging applies **that saved
+   plan**. A plan created before the secret changed still contains the old token, so re-run it
+   before merging.
 
 ## Permission
 
