@@ -1713,8 +1713,8 @@ resource "grafana_dashboard" "traffic_statistics" {
         {
           "current" : {
             "selected" : true,
-            "text" : "influxdb-apollo-terraform",
-            "value" : "adg0kuh36f37kd"
+            "text" : grafana_data_source.influxdb.name,
+            "value" : grafana_data_source.influxdb.uid
           },
           "hide" : 0,
           "includeAll" : false,
@@ -1774,7 +1774,7 @@ resource "grafana_dashboard" "teltonika_lte" {
       {
         "datasource" : {
           "type" : "influxdb",
-          "uid" : "11e7VrHnk"
+          "uid" : grafana_data_source.influxdb.uid
         },
         "description" : "SINR (The signal-to-noise ratio) value in dB.\n* more than 21 dB - very good\n* from 13 dB to 20 dB - good\n* from 0 dB do 12 dB - bad, an external antenna is needed.\n* less than 0 dB – very poor conditions, an external antenna is needed.",
         "fieldConfig" : {
@@ -1855,7 +1855,7 @@ resource "grafana_dashboard" "teltonika_lte" {
           {
             "datasource" : {
               "type" : "influxdb",
-              "uid" : "11e7VrHnk"
+              "uid" : grafana_data_source.influxdb.uid
             },
             "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_field\"] == \"mSINR\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
             "refId" : "A"
@@ -1867,7 +1867,7 @@ resource "grafana_dashboard" "teltonika_lte" {
       {
         "datasource" : {
           "type" : "influxdb",
-          "uid" : "11e7VrHnk"
+          "uid" : grafana_data_source.influxdb.uid
         },
         "description" : "Signal strength level",
         "fieldConfig" : {
@@ -1948,7 +1948,7 @@ resource "grafana_dashboard" "teltonika_lte" {
           {
             "datasource" : {
               "type" : "influxdb",
-              "uid" : "11e7VrHnk"
+              "uid" : grafana_data_source.influxdb.uid
             },
             "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_field\"] == \"mSignal\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
             "refId" : "A"
@@ -1960,7 +1960,7 @@ resource "grafana_dashboard" "teltonika_lte" {
       {
         "datasource" : {
           "type" : "influxdb",
-          "uid" : "11e7VrHnk"
+          "uid" : grafana_data_source.influxdb.uid
         },
         "description" : "RSRP (Reference Signal Receive Power) value in dBm\n* more than -79 dBm - very good signal\n* from -80 dBm to -90 dBm - good signal\n* from -91 dBm to -100 dBm - weak signal, an external antenna is recommended or a better position of the modem is needed.\n* less than -100 dBm - very poor signal, an external antenna is needed.",
         "fieldConfig" : {
@@ -2043,7 +2043,7 @@ resource "grafana_dashboard" "teltonika_lte" {
           {
             "datasource" : {
               "type" : "influxdb",
-              "uid" : "11e7VrHnk"
+              "uid" : grafana_data_source.influxdb.uid
             },
             "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_field\"] == \"mRSRP\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
             "refId" : "A"
@@ -2055,7 +2055,7 @@ resource "grafana_dashboard" "teltonika_lte" {
       {
         "datasource" : {
           "type" : "influxdb",
-          "uid" : "11e7VrHnk"
+          "uid" : grafana_data_source.influxdb.uid
         },
         "description" : "RSRQ (Reference Signal Receive Quality) value in dB\nRSRQ – Indicates quality of the received signal, and its range is typically -19.5dB(bad) to -3dB (good).\n* more than -9 dB - very good\n* from -10 dB to -15 dB - good\n* form -16 dB to -20 dB - bad, an external antenna is needed or a better position of the modem.\n* less than -20 dB – very bad, an external antenna is needed.",
         "fieldConfig" : {
@@ -2136,7 +2136,7 @@ resource "grafana_dashboard" "teltonika_lte" {
           {
             "datasource" : {
               "type" : "influxdb",
-              "uid" : "11e7VrHnk"
+              "uid" : grafana_data_source.influxdb.uid
             },
             "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_field\"] == \"mRSRQ\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
             "refId" : "A"
@@ -2148,7 +2148,7 @@ resource "grafana_dashboard" "teltonika_lte" {
       {
         "datasource" : {
           "type" : "influxdb",
-          "uid" : "11e7VrHnk"
+          "uid" : grafana_data_source.influxdb.uid
         },
         "description" : "Cell ID",
         "fieldConfig" : {
@@ -2212,7 +2212,7 @@ resource "grafana_dashboard" "teltonika_lte" {
           {
             "datasource" : {
               "type" : "influxdb",
-              "uid" : "11e7VrHnk"
+              "uid" : grafana_data_source.influxdb.uid
             },
             "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_field\"] == \"mCellID\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
             "refId" : "A"
@@ -2224,7 +2224,7 @@ resource "grafana_dashboard" "teltonika_lte" {
       {
         "datasource" : {
           "type" : "influxdb",
-          "uid" : "11e7VrHnk"
+          "uid" : grafana_data_source.influxdb.uid
         },
         "description" : "Modem's temperature in 0.1 degrees Celsius",
         "fieldConfig" : {
@@ -2303,7 +2303,7 @@ resource "grafana_dashboard" "teltonika_lte" {
           {
             "datasource" : {
               "type" : "influxdb",
-              "uid" : "11e7VrHnk"
+              "uid" : grafana_data_source.influxdb.uid
             },
             "query" : "from(bucket: \"Network\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_field\"] == \"mTemperature\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
             "refId" : "A"
@@ -2367,7 +2367,7 @@ resource "grafana_dashboard" "temperature" {
       {
         "datasource" : {
           "type" : "influxdb",
-          "uid" : "11e7VrHnk"
+          "uid" : grafana_data_source.influxdb.uid
         },
         "fieldConfig" : {
           "defaults" : {
@@ -2447,7 +2447,7 @@ resource "grafana_dashboard" "temperature" {
           {
             "datasource" : {
               "type" : "influxdb",
-              "uid" : "11e7VrHnk"
+              "uid" : grafana_data_source.influxdb.uid
             },
             "hide" : false,
             "query" : "from(bucket: \"Temperature\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"tmp_in\" or r[\"_measurement\"] == \"tmp_out\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"tmp_in\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
@@ -2456,7 +2456,7 @@ resource "grafana_dashboard" "temperature" {
           {
             "datasource" : {
               "type" : "influxdb",
-              "uid" : "11e7VrHnk"
+              "uid" : grafana_data_source.influxdb.uid
             },
             "hide" : false,
             "query" : "from(bucket: \"Temperature\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"tmp_in\" or r[\"_measurement\"] == \"tmp_out\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"tmp_out\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",

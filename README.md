@@ -1,13 +1,17 @@
 # grafana-cloud-terrraform
 Grafana Cloud managed by Terraform
 
+Data source: `influxdb-cloud` (uid `influxdb-cloud`) → InfluxDB Cloud 2, `https://westeurope-1.azure.cloud2.influxdata.com`,
+org ID `15297d32235a99a0`, buckets `Network` and `Temperature` (managed in `germanium-git/influxdb-cloud`).
+All dashboards reference it by uid.
+
 ## Secrets
 
 | GH secret  | TF variable  | Description  |
 |---|---|---|
 | TF_GRAFANA_AUTH | GRAFANA_AUTH | Grafana Cloud Service account |
 | TF_API_TOKEN | N/A (used by GH action to talk to the backend in TF Cloud) | Terraform Cloud API token |
-| TF_GRAFANA_INFLUX_TOKEN | GRAFANA_INFLUX_TOKEN | InfluxDB API token - `grafana-data-source-terraform` |
+| TF_GRAFANA_INFLUX_TOKEN | GRAFANA_INFLUX_TOKEN | Read-only InfluxDB Cloud token (`dashboards: read Network, Temperature`) from [germanium-git/influxdb-cloud](https://github.com/germanium-git/influxdb-cloud): `terraform output -raw reader_token` |
 | GH_TOKEN | N/A (used by GH action to push commets to PR) |  GH Organization > Developers Settings > Personal Access Tokens > grafana_cloud GH Action |
 
 Note: There is another secret called GITHUB_TOKEN that is generetaed automatically by GH Action and whose permission is set by Settings > Actions > Workflow permissions.
